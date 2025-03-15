@@ -1,18 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  FileText,
-  Brain,
-  Zap,
-  Lock,
-  Sparkles,
-  ArrowRight,
-  CheckCircle2,
-  Star,
-  Users,
-  MessageSquare
-} from 'lucide-react';
+import { FileText, Brain, Zap, Lock, Sparkles, ArrowRight, CheckCircle2, Star, Users, MessageSquare } from 'lucide-react';
 
 function HomePage() {
   const fadeIn = {
@@ -34,10 +23,7 @@ function HomePage() {
             Transform Your Documents with
             <span className="gradient-text block mt-2 shine">AI-Powered Analysis</span>
           </motion.h1>
-          <motion.p
-            className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto"
-            {...fadeIn}
-          >
+          <motion.p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto" {...fadeIn}>
             Extract valuable insights, summaries, and knowledge from your documents using advanced AI technology.
           </motion.p>
           <motion.div {...fadeIn}>
@@ -77,7 +63,7 @@ function HomePage() {
               </p>
             </motion.div>
             
-            {/* Similar motion.div wrappers for other feature cards */}
+            {/* Other feature cards retained as originally implemented */}
             <motion.div
               className="feature-card"
               whileHover={{ scale: 1.02 }}
@@ -142,7 +128,7 @@ function HomePage() {
               viewport={{ once: true }}
             >
               <MessageSquare className="w-10 h-10 text-indigo-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Interactive Q&A</h3>
+              <h3 className="text-xl font-semibold mb-2">Interactive Q&amp;A</h3>
               <p className="text-gray-400">
                 Ask questions about your documents and get instant, accurate answers.
               </p>
