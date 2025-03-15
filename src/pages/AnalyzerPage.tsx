@@ -13,13 +13,13 @@ import toast from 'react-hot-toast';
 import OpenAI from 'openai';
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set the worker source to point to the worker file in your public folder
+// Set the PDF.js worker source to the static file in your public folder
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 
-// Initialize OpenAI client (replace the API key with your own)
+// Initialize OpenAI client with your API key
 const openai = new OpenAI({
-  apiKey: "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",
-  dangerouslyAllowBrowser: true // For production, consider handling API calls on the server side.
+  apiKey: "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", // Replace with your actual OpenAI API key
+  dangerouslyAllowBrowser: true  // For production, consider moving API calls to the server side.
 });
 
 interface Analysis {
@@ -61,25 +61,28 @@ function AnalyzerPage() {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Function to extract text from PDF
+  // Helper function to truncate long file names for mobile view
+  const getDisplayFileName = (name: string) => {
+    const maxLength = 20;
+    return name.length > maxLength ? name.substring(0, maxLength) + '...' : name;
+  };
+
+  // Function to extract text from a PDF file
   const extractTextFromPdf = async (file: File): Promise<string> => {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
       const pdf = await loadingTask.promise;
       let fullText = '';
-
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
         const pageText = textContent.items.map((item: any) => item.str).join(' ');
         fullText += pageText + '\n';
       }
-
       if (!fullText.trim()) {
         throw new Error("No text could be extracted from the PDF.");
       }
-
       return fullText;
     } catch (err) {
       console.error('PDF extraction error:', err);
@@ -87,7 +90,7 @@ function AnalyzerPage() {
     }
   };
 
-  // Function to extract text from TXT file
+  // Function to extract text from a TXT file
   const extractTextFromTxt = async (file: File): Promise<string> => {
     try {
       const text = await file.text();
@@ -101,14 +104,14 @@ function AnalyzerPage() {
     }
   };
 
-  // Function to analyze text using OpenAI API
+  // Function to analyze text using the OpenAI API
   const analyzeTextWithOpenAI = async (text: string): Promise<Analysis> => {
     try {
-      // Trim text if it's too long (OpenAI has token limits)
+      // Trim text if it's too long
       const trimmedText = text.length > 15000 ? text.substring(0, 15000) + "..." : text;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Switched to GPT-3.5-turbo for compatibility
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
@@ -130,7 +133,6 @@ function AnalyzerPage() {
       console.log("OpenAI Response:", content);
       const parsedContent = JSON.parse(content);
 
-      // Map OpenAI response to our Analysis interface
       return {
         summary: {
           brief: parsedContent.summary?.brief || [],
@@ -158,7 +160,6 @@ function AnalyzerPage() {
     const toastId = toast.loading('Analyzing your document...');
 
     try {
-      // Extract text based on file type
       let extractedText = '';
       if (file.type === 'application/pdf') {
         toast.loading('Extracting text from PDF...', { id: toastId });
@@ -172,7 +173,6 @@ function AnalyzerPage() {
 
       setFileContent(extractedText);
 
-      // Analyze text with OpenAI
       toast.loading('Processing with AI...', { id: toastId });
       const analysisResult = await analyzeTextWithOpenAI(extractedText);
 
@@ -195,7 +195,7 @@ function AnalyzerPage() {
         setFile(selectedFile);
         setAnalysis(null);
         setError(null);
-        toast.success(`File "${selectedFile.name}" selected`);
+        toast.success(`File "${getDisplayFileName(selectedFile.name)}" selected`);
       } else {
         toast.error('Please select a PDF or text file');
       }
@@ -221,7 +221,7 @@ function AnalyzerPage() {
         setFile(droppedFile);
         setAnalysis(null);
         setError(null);
-        toast.success(`File "${droppedFile.name}" dropped`);
+        toast.success(`File "${getDisplayFileName(droppedFile.name)}" dropped`);
       } else {
         toast.error('Please drop a PDF or text file');
       }
@@ -275,7 +275,9 @@ function AnalyzerPage() {
             <div className="text-center">
               <p className="text-white text-2xl flex items-center justify-center">
                 <FilePenLine className="mr-2 h-6 w-6 text-blue-400" />
-                <span className="font-semibold">{file.name}</span>
+                <span className="font-semibold max-w-xs truncate">
+                  {file.name}
+                </span>
               </p>
               <p className="text-gray-400 text-base mt-2">
                 {file.type === 'application/pdf' ? 'PDF Document' : 'Text File'} • {(file.size / 1024).toFixed(1)} KB
