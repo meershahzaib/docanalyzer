@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Comfortaa Light (redundant with index.html, but kept as a fallback) */
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap');
+
+@layer base {
+  html, body, button, input, textarea, select {
+    font-family: 'Comfortaa', sans-serif !important;
+  }
+}
+
+/* Existing custom styles */
 .pattern-bg {
   background-color: #0f172a;
   background-image: linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),

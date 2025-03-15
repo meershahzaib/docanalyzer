@@ -2,7 +2,12 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        // Set the default sans font to Comfortaa Light (weight 300)
+        sans: ['Comfortaa', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 };
